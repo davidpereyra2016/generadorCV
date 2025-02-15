@@ -1,6 +1,7 @@
 [build]
   command = "npm install && npm run build"
   publish = ".next"
+  base = "integraciones/checkout-pro"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

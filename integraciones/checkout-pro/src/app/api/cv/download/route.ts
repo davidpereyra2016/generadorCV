@@ -3,12 +3,14 @@ import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { generatePDF } from "@/utils/pdfGenerator";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 
-const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN! });
+const mercadopago = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN! });
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const preferenceId = searchParams.get('preference_id');
+
+    console.log('Download requested for preference:', preferenceId);
 
     if (!preferenceId) {
       return NextResponse.json(
@@ -17,54 +19,89 @@ export async function GET(request: Request) {
       );
     }
 
-    const payment = await client.payment.search({
-      options: {
-        criteria: "desc",
-        limit: 1
-      },
-      qs: {
-        external_reference: preferenceId
-      }
-    });
+    // Buscamos el archivo JSON que coincida con el preferenceId
+    const files = readdirSync('db');
+    const jsonFile = files.find(f => f.startsWith(preferenceId) && f.endsWith('.json'));
+    const pdfFile = jsonFile?.replace('.json', '.pdf');
 
-    if (!payment.results || payment.results.length === 0) {
+    if (!jsonFile) {
       return NextResponse.json(
-        { error: "Payment not found" },
+        { error: "CV data not found" },
         { status: 404 }
       );
     }
 
-    const paymentInfo = payment.results[0];
+    console.log('Found JSON file:', jsonFile);
+    console.log('PDF file would be:', pdfFile);
 
-    if (paymentInfo.status !== "approved") {
-      return NextResponse.json(
-        { error: "Payment not approved" },
-        { status: 400 }
-      );
-    }
+    // Si el PDF no existe, lo generamos
+    if (!existsSync(`db/${pdfFile}`)) {
+      console.log('PDF does not exist, generating...');
+      try {
+        // Leemos los datos del CV
+        const cvData = JSON.parse(readFileSync(`db/${jsonFile}`, 'utf-8'));
+        
+        // Verificamos el estado del pago para obtener la plantilla
+        const payment = await new Payment(mercadopago).search({
+          options: {
+            criteria: "desc",
+            limit: 1
+          },
+          filters: {
+            external_reference: preferenceId
+          }
+        });
 
-    const pdfPath = await generatePDF(preferenceId);
+        if (!payment.results || payment.results.length === 0) {
+          return NextResponse.json(
+            { error: "Payment not found" },
+            { status: 404 }
+          );
+        }
 
-    if (!existsSync(pdfPath)) {
-      return NextResponse.json(
-        { error: "PDF not found" },
-        { status: 404 }
-      );
-    }
+        const plantilla = payment.results[0].metadata?.plantilla || cvData.plantilla || 'basica';
+        console.log('Using plantilla:', plantilla);
 
-    const pdfContent = readFileSync(pdfPath);
+        // Generamos el PDF
+        const pdfBuffer = await generatePDF({
+          ...cvData,
+          plantilla
+        });
 
-    return new NextResponse(pdfContent, {
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="cv-${preferenceId}.pdf"`
+        // Guardamos el PDF
+        writeFileSync(`db/${pdfFile}`, pdfBuffer);
+        console.log('PDF generated and saved successfully');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        return NextResponse.json(
+          { error: "Error generating PDF", details: error.message },
+          { status: 500 }
+        );
       }
-    });
+    }
 
+    try {
+      // Leemos el PDF
+      const pdfBuffer = readFileSync(`db/${pdfFile}`);
+
+      // Devolvemos el PDF
+      return new NextResponse(pdfBuffer, {
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename="${pdfFile}"`,
+        },
+      });
+    } catch (error) {
+      console.error('Error reading PDF:', error);
+      return NextResponse.json(
+        { error: "Error reading PDF" },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error downloading CV:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Error downloading CV" },
       { status: 500 }
     );
   }

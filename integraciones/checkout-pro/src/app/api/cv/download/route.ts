@@ -43,13 +43,9 @@ export async function GET(request: Request) {
         
         // Verificamos el estado del pago para obtener la plantilla
         const payment = await new Payment(mercadopago).search({
-          options: {
-            criteria: "desc",
-            limit: 1
-          },
-          filters: {
-            external_reference: preferenceId
-          }
+          criteria: "desc",
+          limit: 1,
+          external_reference: preferenceId
         });
 
         if (!payment.results || payment.results.length === 0) {

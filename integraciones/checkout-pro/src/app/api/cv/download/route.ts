@@ -47,7 +47,7 @@ export async function GET(request: Request) {
             criteria: "desc",
             limit: 1
           },
-          filters: {
+          qs: {
             external_reference: preferenceId
           }
         });

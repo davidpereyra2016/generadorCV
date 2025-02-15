@@ -12,9 +12,13 @@
     "@opentelemetry/api-logs": "^0.53.0",
     "@vercel/otel": "^1.10.0",
     "autoprefixer": "^10.4.20",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
+    "lucide-react": "^0.475.0",
     "mercadopago": "^2.0.15",
     "next": "15.0.0-canary.192",
     "postcss": "^8.4.47",
+    "puppeteer": "^24.2.0",
     "react": "19.0.0-rc-e4953922-20240919",
     "react-dom": "19.0.0-rc-e4953922-20240919",
     "tailwindcss": "^3.4.12"

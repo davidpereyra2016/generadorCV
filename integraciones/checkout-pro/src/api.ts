@@ -7,7 +7,23 @@ interface Message {
   text: string;
 }
 
-export const mercadopago = new MercadoPagoConfig({accessToken: process.env.MP_ACCESS_TOKEN!});
+type TipoPlantilla = "basica" | "profesional";
+
+interface CVData {
+  plantilla: TipoPlantilla;
+}
+
+const mercadopago = new MercadoPagoConfig({accessToken: process.env.MP_ACCESS_TOKEN!});
+
+const PRECIOS: Record<TipoPlantilla, number> = {
+  basica: 1000,
+  profesional: 2000,
+};
+
+const NOMBRES_PLANTILLAS: Record<TipoPlantilla, string> = {
+  basica: "CV Básico",
+  profesional: "CV Profesional Premium",
+};
 
 const api = {
   message: {
@@ -33,21 +49,35 @@ const api = {
       // Guardamos los datos
       writeFileSync("db/message.db", JSON.stringify(draft, null, 2));
     },
-    async submit(text: Message["text"]) {
-      // Creamos la preferencia incluyendo el precio, titulo y metadata. La información de `items` es standard de Mercado Pago. La información que nosotros necesitamos para nuestra DB debería vivir en `metadata`.
+    async submit(text: Message["text"], cvData: CVData) {
+      const precio = PRECIOS[cvData.plantilla];
+      const nombrePlantilla = NOMBRES_PLANTILLAS[cvData.plantilla];
+
+      // Creamos la preferencia incluyendo el precio, titulo y metadata
       const preference = await new Preference(mercadopago).create({
         body: {
           items: [
             {
-              id: "message",
-              unit_price: 100,
+              id: cvData.plantilla,
+              title: nombrePlantilla,
+              unit_price: precio,
               quantity: 1,
-              title: "Mensaje de muro",
+              currency_id: "ARS",
+              description: `Generación de Curriculum Vitae - ${nombrePlantilla}`,
             },
           ],
           metadata: {
             text,
+            cvData: JSON.stringify(cvData),
           },
+          // Configuramos las URLs de redirección a la descarga del PDF
+          back_urls: {
+            success: `${process.env.NEXT_PUBLIC_BASE_URL}/api/cv/download?status=success`,
+            pending: `${process.env.NEXT_PUBLIC_BASE_URL}/api/cv/download?status=pending`,
+            failure: `${process.env.NEXT_PUBLIC_BASE_URL}/api/cv/download?status=failure`,
+          },
+          // Redirigir automáticamente
+          auto_return: "approved",
         },
       });
 

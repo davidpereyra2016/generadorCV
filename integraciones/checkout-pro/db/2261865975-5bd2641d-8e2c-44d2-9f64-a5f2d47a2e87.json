@@ -1,0 +1,36 @@
+{
+  "nombreCompleto": "preyra alaya",
+  "fechaNacimiento": "2025-02-19",
+  "dni": "70323555",
+  "edad": "19",
+  "titulo": "analista",
+  "email": "davidpereyra2013.dp@gmail.com",
+  "telefono": "+543704858458",
+  "direccion": "Paraguay 520",
+  "foto": "",
+  "resumen": "asdf",
+  "experiencia": [
+    {
+      "cargo": "asdf",
+      "empresa": "asdf",
+      "fechaInicio": "2025-03-01",
+      "fechaFin": "",
+      "descripcion": "asdf"
+    }
+  ],
+  "educacion": [
+    {
+      "titulo": "asdf",
+      "institucion": "asdf",
+      "fechaInicio": "2025-03-08",
+      "fechaFin": "",
+      "descripcion": "asdf"
+    }
+  ],
+  "habilidades": [
+    "asdf",
+    "asdf"
+  ],
+  "plantilla": "basica",
+  "payment_id": "2261865975-5bd2641d-8e2c-44d2-9f64-a5f2d47a2e87"
+}

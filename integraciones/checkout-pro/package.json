@@ -9,13 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@opentelemetry/api-logs": "^0.53.0",
     "@vercel/otel": "^1.10.0",
     "autoprefixer": "^10.4.20",
     "glob": "^9.3.5",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
-    "lucide-react": "^0.330.0",
     "mercadopago": "^2.0.15",
     "next": "^15.1.7",
     "postcss": "^8.4.47",

@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useState} from "react";
-import {PlusCircle, MinusCircle, Upload} from "lucide-react";
+import {PlusCircleIcon, MinusCircleIcon, ArrowUpTrayIcon} from "@heroicons/react/24/outline";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -275,13 +275,13 @@ const CVForm: React.FC = () => {
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-gray-400">
-                      <Upload size={32} />
+                      <ArrowUpTrayIcon width={32} />
                     </div>
                   )}
                 </div>
                 <label className="cursor-pointer rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700">
                   <span className="flex items-center gap-2">
-                    <Upload size={16} />
+                    <ArrowUpTrayIcon width={16} />
                     Subir Foto
                   </span>
                   <input
@@ -408,7 +408,7 @@ const CVForm: React.FC = () => {
                 className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
                 onClick={agregarExperiencia}
               >
-                <PlusCircle size={20} /> Agregar
+                <PlusCircleIcon width={20} /> Agregar
               </button>
             </div>
             <div className="space-y-6">
@@ -419,7 +419,7 @@ const CVForm: React.FC = () => {
                       className="text-red-500 hover:text-red-600"
                       onClick={() => eliminarExperiencia(index)}
                     >
-                      <MinusCircle size={20} />
+                      <MinusCircleIcon width={20} />
                     </button>
                   </div>
                   <div className="space-y-4">
@@ -477,7 +477,7 @@ const CVForm: React.FC = () => {
                 className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
                 onClick={agregarEducacion}
               >
-                <PlusCircle size={20} /> Agregar
+                <PlusCircleIcon width={20} /> Agregar
               </button>
             </div>
             <div className="space-y-6">
@@ -488,7 +488,7 @@ const CVForm: React.FC = () => {
                       className="text-red-500 hover:text-red-600"
                       onClick={() => eliminarEducacion(index)}
                     >
-                      <MinusCircle size={20} />
+                      <MinusCircleIcon width={20} />
                     </button>
                   </div>
                   <div className="space-y-4">
@@ -544,7 +544,7 @@ const CVForm: React.FC = () => {
                 className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
                 onClick={() => setCVData({...cvData, habilidades: [...cvData.habilidades, ""]})}
               >
-                <PlusCircle size={20} /> Agregar
+                <PlusCircleIcon width={20} /> Agregar
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -574,7 +574,7 @@ const CVForm: React.FC = () => {
                       setCVData({...cvData, habilidades});
                     }}
                   >
-                    <MinusCircle size={16} />
+                    <MinusCircleIcon width={16} />
                   </button>
                 </div>
               ))}

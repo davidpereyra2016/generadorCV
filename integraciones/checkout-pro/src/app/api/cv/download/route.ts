@@ -12,8 +12,10 @@ export async function GET(request: Request) {
   try {
     const {searchParams} = new URL(request.url);
     const preferenceId = searchParams.get("preference_id");
+    const paymentId = searchParams.get("payment_id");
 
     console.log("Download requested for preference:", preferenceId);
+    console.log("Payment ID:", paymentId);
 
     if (!preferenceId) {
       return NextResponse.json({error: "Preference ID is required"}, {status: 400});
@@ -38,24 +40,10 @@ export async function GET(request: Request) {
         // Leemos los datos del CV
         const cvData = JSON.parse(readFileSync(`db/${jsonFile}`, "utf-8"));
 
-        // Verificamos el estado del pago para obtener la plantilla
-        const payment = await new Payment(mercadopago).get({
-          id: preferenceId
-        });
-
-        if (!payment.results || payment.results.length === 0) {
-          return NextResponse.json({error: "Payment not found"}, {status: 404});
-        }
-
-        // Obtenemos la plantilla del pago o usamos una por defecto
-        const plantilla = payment.results[0].metadata?.plantilla || cvData.plantilla || "basica";
-
-        console.log("Using plantilla:", plantilla);
-
-        // Generamos el PDF
+        // Generamos el PDF con la plantilla del CV
         const pdfBuffer = await generatePDF({
           ...cvData,
-          plantilla,
+          plantilla: cvData.plantilla || "basica",
         });
 
         // Guardamos el PDF

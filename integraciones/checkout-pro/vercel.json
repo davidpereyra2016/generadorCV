@@ -3,9 +3,5 @@
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "regions": ["iad1"],
-  "env": {
-    "NEXT_PUBLIC_BASE_URL": "@next_public_base_url",
-    "MP_ACCESS_TOKEN": "@mp_access_token"
-  }
+  "regions": ["iad1"]
 }

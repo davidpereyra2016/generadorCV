@@ -5,6 +5,16 @@ import { generatePDF } from "@/utils/pdfGenerator";
 
 const mercadopago = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN! });
 
+interface PaymentResponseData {
+  status: string;
+  order: {
+    id: string;
+  };
+  metadata?: {
+    plantilla?: string;
+  };
+}
+
 export async function POST(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -22,9 +32,10 @@ export async function POST(request: Request) {
     }
 
     console.log('Fetching payment:', paymentId);
-    const payment = await new Payment(mercadopago).get({ id: paymentId });
+    const payment = await new Payment(mercadopago).get({ id: Number(paymentId) });
+    const paymentData = payment.results[0] as PaymentResponseData;
 
-    if (payment.status !== 200) {
+    if (!paymentData) {
       console.error('Error fetching payment:', payment);
       return NextResponse.json(
         { error: "Error fetching payment", details: payment },
@@ -32,18 +43,18 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log('Payment status:', payment.response.status);
+    console.log('Payment status:', paymentData.status);
 
     // Verificamos si el pago fue aprobado
-    if (payment.response.status === 'approved') {
-      const preferenceId = payment.response.order.id;
-      const plantilla = payment.response.metadata?.plantilla;
+    if (paymentData.status === 'approved') {
+      const preferenceId = paymentData.order.id;
+      const plantilla = paymentData.metadata?.plantilla;
 
       console.log('Using preference ID:', preferenceId);
       console.log('Using plantilla:', plantilla);
 
       if (!plantilla) {
-        console.error('No plantilla in metadata:', payment.response.metadata);
+        console.error('No plantilla in metadata:', paymentData.metadata);
         return NextResponse.json(
           { error: "Plantilla not found in metadata" },
           { status: 400 }
@@ -90,7 +101,10 @@ export async function POST(request: Request) {
       } catch (error) {
         console.error('Error processing PDF:', error);
         return NextResponse.json(
-          { error: "Error processing PDF", details: error.message },
+          { 
+            error: "Error processing PDF", 
+            details: error instanceof Error ? error.message : 'Unknown error' 
+          },
           { status: 500 }
         );
       }
@@ -100,7 +114,10 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error processing webhook:', error);
     return NextResponse.json(
-      { error: "Error processing webhook", details: error.message },
+      { 
+        error: "Error processing webhook", 
+        details: error instanceof Error ? error.message : 'Unknown error' 
+      },
       { status: 500 }
     );
   }

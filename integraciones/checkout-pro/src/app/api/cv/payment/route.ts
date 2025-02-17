@@ -9,6 +9,8 @@ const PRECIOS = {
   profesional: 2000,
 } as const;
 
+type Plantilla = keyof typeof PRECIOS;
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -18,6 +20,7 @@ export async function POST(request: Request) {
       body: {
         items: [
           {
+            id: "1",
             title: plantilla === "basica" ? "CV Básico" : "CV Profesional",
             quantity: 1,
             unit_price: PRECIOS[plantilla],

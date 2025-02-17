@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET(
   request: Request,
   { params }: { params: { paymentId: string } }
-) {
+): Promise<NextResponse> {
   try {
     // Buscamos el mensaje asociado al pago
     const db = JSON.parse(readFileSync("db/message.db").toString());
@@ -26,7 +26,10 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching CV:", error);
     return NextResponse.json(
-      { error: "Error fetching CV" },
+      { 
+        error: "Error fetching CV: " + 
+        (error instanceof Error ? error.message : 'Unknown error') 
+      },
       { status: 500 }
     );
   }

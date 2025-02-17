@@ -29,7 +29,10 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Error saving CV:", error);
     return NextResponse.json(
-      { error: "Error saving CV: " + (error.message || 'Unknown error') },
+      { 
+        error: "Error saving CV: " + 
+        (error instanceof Error ? error.message : 'Unknown error') 
+      },
       { status: 500 }
     );
   }

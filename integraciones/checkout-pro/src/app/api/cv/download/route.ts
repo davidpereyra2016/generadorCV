@@ -39,10 +39,8 @@ export async function GET(request: Request) {
         const cvData = JSON.parse(readFileSync(`db/${jsonFile}`, "utf-8"));
 
         // Verificamos el estado del pago para obtener la plantilla
-        const payment = await new Payment(mercadopago).search({
-          external_reference: preferenceId,
-          sort: "date_created:desc",
-          limit: 1
+        const payment = await new Payment(mercadopago).get({
+          id: preferenceId
         });
 
         if (!payment.results || payment.results.length === 0) {
@@ -67,8 +65,11 @@ export async function GET(request: Request) {
         console.error("Error generating PDF:", error);
 
         return NextResponse.json(
-          {error: "Error generating PDF", details: error.message},
-          {status: 500},
+          { 
+            error: "Error generating PDF", 
+            details: error instanceof Error ? error.message : 'Unknown error'
+          },
+          { status: 500 }
         );
       }
     }

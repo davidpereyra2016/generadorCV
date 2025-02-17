@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
       console.log('Using preference ID:', preferenceId);
       console.log('Using plantilla:', plantilla);
-      
+
       if (!plantilla) {
         console.error('No plantilla in metadata:', payment.response.metadata);
         return NextResponse.json(
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
           { status: 400 }
         );
       }
-      
+
       try {
         // Buscamos el archivo JSON que coincida con el inicio del preferenceId
         const files = readdirSync('db');
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         console.log('PDF saved successfully');
         
         console.log('Files in db folder after processing:', readdirSync('db'));
-
+        
         return NextResponse.json({ success: true });
       } catch (error) {
         console.error('Error processing PDF:', error);

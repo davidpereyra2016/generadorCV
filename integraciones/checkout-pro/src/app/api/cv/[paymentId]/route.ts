@@ -1,14 +1,14 @@
 import { readFileSync } from "node:fs";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  context: { params: { paymentId: string } }
+  { params }: { params: { paymentId: string } }
 ): Promise<NextResponse> {
   try {
     // Buscamos el mensaje asociado al pago
     const db = JSON.parse(readFileSync("db/message.db").toString());
-    const message = db.find((msg: any) => msg.id === Number(context.params.paymentId));
+    const message = db.find((msg: any) => msg.id === Number(params.paymentId));
 
     if (!message) {
       return NextResponse.json(
